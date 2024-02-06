@@ -1,2 +1,3 @@
-# xaemiphor.proxmox
-Ansible collection for Proxmox
+# Ansible Collection - xaemiphor.proxmox
+
+Documentation for the collection.
