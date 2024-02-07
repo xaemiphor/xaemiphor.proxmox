@@ -1,8 +1,12 @@
 ---
 - name: Update grub
   ansible.builtin.command: /usr/sbin/update-grub
+  changed_when: true
+
 - name: Update systemd-boot
   ansible.builtin.command: /usr/sbin/proxmox-boot-tool refresh
+  changed_when: true
+
 - name: Reboot node
   ansible.builtin.reboot:
   when: iommu_reboot | default(false)
