@@ -1,2 +1,30 @@
 ---
-# tasks file for iommu
+- name: Check if using grub or systemd-boot
+  ansible.builtin.stat:
+    path: /etc/kernel/cmdline
+  register: __systemd_boot
+
+- name: Generate variables for validation and update
+  vars:
+    __boot_type: "{{ 'systemd-boot' if __systemd_boot.stat.exists and __systemd_boot.stat.isdir else 'grub' }}"
+    __cpu_type_dict:
+      intel: "{{ 'GenuineIntel' in ansible_processor }}"
+      amd: "{{ 'AuthenticAMD' in ansible_processor }}"
+      other: "{{ 'GenuineIntel' not in ansible_processor and 'AuthenticAMD' not in ansible_processor }}"
+      error: "{{ 'GenuineIntel' in ansible_processor and 'AuthenticAMD' in ansible_processor }}"
+    __cpu_type: "{{ __cpu_type_dict | dict2items | selectattr('value') | map(attribute='key') | last }}"
+  block:
+    - name: Confirm we identified CPU and boot type
+      ansible.builtin.assert:
+        that:
+          - __cpu_type in ['amd', 'intel']
+        fail_msg: "Detected CPU type was {{ __cpu_type }}, did not match amd or intel."
+        quiet: true
+
+    - name: "Update {{ __boot_type }}"
+      ansible.builtin.include_tasks: "{{ __boot_type }}_{{ __include }}.yml"
+      vars:
+        __include: "{{ 'enable' if iommu_state | lower in ['enable','enabled'] else 'disable'}}"
+        __cfg_keys:
+          - "{{ __cpu_type }}_iommu=on"
+          - "iommu=pt"

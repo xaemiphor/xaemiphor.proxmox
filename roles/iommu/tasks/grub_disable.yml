@@ -1,0 +1,20 @@
+---
+- name: grub_disable | Update /etc/default/grub
+  become: true
+  notify:
+    - Update grub
+  ansible.builtin.lineinfile:
+    state: present
+    dest: /etc/default/grub
+    backrefs: true
+    regexp: "{{ __regexp.pre }}{{ item }}{{ __regexp.post }}"
+    line: "\\1\\3"
+  loop: "{{ __cfg_keys }}"
+  vars:
+    __regexp:
+      pre: '^(GRUB_CMDLINE_LINUX_DEFAULT=.*)\s*(\b'
+      post: '\b)\s*(.*)$'
+#    - regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.*\bamd_iommu)\"[^\"]+)(\".*)'
+#      line: '\1 amd_iommu=on\2'
+#    - regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.*\biommu=pt)\"[^\"]+)(\".*)'
+#      line: '\1 iommu=pt\2'

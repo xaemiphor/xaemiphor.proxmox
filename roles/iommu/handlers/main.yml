@@ -1,2 +1,8 @@
 ---
-# handlers file for iommu
+- name: Update grub
+  ansible.builtin.command: /usr/sbin/update-grub
+- name: Update systemd-boot
+  ansible.builtin.command: /usr/sbin/proxmox-boot-tool refresh
+- name: Reboot node
+  ansible.builtin.reboot:
+  when: iommu_reboot | default(false)
