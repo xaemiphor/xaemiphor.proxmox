@@ -1,0 +1,37 @@
+---
+- name: Generate variables for validation and update
+  vars:
+    __cpu_type_dict:
+      intel: "{{ 'GenuineIntel' in ansible_processor }}"
+      amd: "{{ 'AuthenticAMD' in ansible_processor }}"
+      other: "{{ 'GenuineIntel' not in ansible_processor and 'AuthenticAMD' not in ansible_processor }}"
+      error: "{{ 'GenuineIntel' in ansible_processor and 'AuthenticAMD' in ansible_processor }}"
+    __cpu_type: "{{ __cpu_type_dict | dict2items | selectattr('value') | map(attribute='key') | last }}"
+  block:
+    - name: Confirm we identified CPU and boot type
+      ansible.builtin.assert:
+        that:
+          - __cpu_type in ['amd', 'intel']
+        fail_msg: "Detected CPU type was {{ __cpu_type }}, did not match amd or intel."
+        quiet: true
+
+    - name: "Create/Update /etc/modprobe.d/kvm.conf"
+      ansible.builtin.lineinfile:
+        state: "{{ item.state }}"
+        dest: "{{ item.dest }}"
+        line: "{{ item.line }}"
+        create: true
+        mode: '0644'
+        owner: root
+        group: root
+      loop:
+        - dest: /etc/modprobe.d/kvm-intel.conf
+          line: 'options kvm-intel nested=Y'
+          state: "{{ 'present' if (nested_virt_state in ['enable', 'enabled'] and __cpu_type == 'intel') else 'absent' }}"
+#          notify: 'Reload kvm_intel'
+        - dest: /etc/modprobe.d/kvm-amd.conf
+          line: 'options kvm-amd nested=1'
+          state: "{{ 'present' if (nested_virt_state in ['enable', 'enabled'] and __cpu_type == 'amd') else 'absent' }}"
+#          notify: 'Reload kvm_amd'
+      notify:
+        - Reboot host

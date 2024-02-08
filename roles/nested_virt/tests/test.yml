@@ -1,0 +1,6 @@
+---
+- name: Test nested_virt role
+  hosts: localhost
+  remote_user: root
+  roles:
+    - nested_virt

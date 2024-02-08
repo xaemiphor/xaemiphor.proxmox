@@ -1,0 +1,3 @@
+---
+nested_virt_state: enabled
+nested_virt_reboot: false
