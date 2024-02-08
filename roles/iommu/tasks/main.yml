@@ -41,4 +41,5 @@
     - vfio_pci
     - vfio_virqfd
   notify:
+    - Update initramfs
     - Reboot host
