@@ -3,6 +3,7 @@
   become: true
   notify:
     - Update grub
+    - Reboot host
   ansible.builtin.lineinfile:
     state: present
     dest: /etc/default/grub

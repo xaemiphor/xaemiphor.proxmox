@@ -1,3 +1,4 @@
 ---
 iommu_state: enabled
+iommu_pt: true
 iommu_reboot: false

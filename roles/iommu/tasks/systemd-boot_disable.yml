@@ -3,6 +3,7 @@
   become: true
   notify:
     - Update systemd-boot
+    - Reboot host
   ansible.builtin.lineinfile:
     state: present
     dest: /etc/kernel/cmdline
