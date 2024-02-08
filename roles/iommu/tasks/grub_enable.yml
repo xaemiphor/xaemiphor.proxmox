@@ -15,7 +15,3 @@
     __regexp:
       pre: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.*\b'
       post: '\b)\"[^\"]+)(\".*)'
-#    - regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.* amd_iommu)\"[^\"]+)(\".*)'
-#      line: '\1 amd_iommu=on\2'
-#    - regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.* iommu=pt)\"[^\"]+)(\".*)'
-#      line: '\1 iommu=pt\2'

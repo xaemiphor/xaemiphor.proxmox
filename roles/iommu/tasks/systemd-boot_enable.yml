@@ -14,7 +14,3 @@
     __regexp:
       pre: '^(?!.*'
       post: ')(.*)$'
-#    - regexp: '^((?!.*\bamd_iommu=on\b))(.*)'
-#      line: '\2 amd_iommu=on'
-#    - regexp: '^((?!.*\biommu=pt\b))(.*)'
-#      line: '\2 iommu=pt'
