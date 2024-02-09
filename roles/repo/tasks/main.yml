@@ -1,0 +1,33 @@
+---
+- name: Configure repositories
+  ansible.builtin.lineinfile:
+    state: present
+    path: "{{ item.path }}"
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+    create: true
+    mode: '0644'
+    owner: root
+    group: root
+  when: "item.when | default(true)"
+  loop_control:
+    label: "{{ item.label }}"
+  loop:
+    - label: "PVE enterprise - {{ 'Disabled' if not repo_enterprise else 'Enabled' }}"
+      path: /etc/apt/sources.list.d/pve-enterprise.list
+      regexp: "(.*)deb https://enterprise.proxmox.com/debian/pve (.*) pve-enterprise"
+      line: "{{ '# ' if not repo_enterprise }}deb https://enterprise.proxmox.com/debian/pve {{ repo_distribution_release }} pve-enterprise"
+    - label: "PVE no-subscription - {{ 'Disabled' if not repo_enterprise else 'Enabled' }}"
+      path: /etc/apt/sources.list.d/pve-install-repo.list
+      regexp: "(.*)deb http://download.proxmox.com/debian/pve (.*) pve-no-subscription"
+      line: "{{ '# ' if not repo_no_subscription }}deb http://download.proxmox.com/debian/pve {{ repo_distribution_release }} pve-no-subscription"
+    - label: "PVE Ceph enterprise - {{ 'Disabled' if (not repo_ceph) or (not repo_enterprise) else 'Enabled' }}"
+      path: /etc/apt/sources.list.d/ceph.list
+      when: "{{ ansible_distribution_major_version is version('12', '>=') }}"
+      regexp: "(.*)deb http://download.proxmox.com/debian/ceph-quincy (.*) enterprise"
+      line: "{{ '# ' if (not repo_ceph) or (not repo_enterprise) }}deb http://download.proxmox.com/debian/ceph-quincy {{ repo_distribution_release }} enterprise"
+    - label: "PVE Ceph no-subscription - {{ 'Disabled' if (not repo_ceph) or (not repo_no_subscription) else 'Enabled' }}"
+      path: /etc/apt/sources.list.d/ceph.list
+      when: "{{ ansible_distribution_major_version is version('12', '>=') }}"
+      regexp: "(.*)deb http://download.proxmox.com/debian/ceph-quincy (.*) no-subscription"
+      line: "{{ '# ' if (not repo_ceph) or (not repo_no_subscription) }}deb http://download.proxmox.com/debian/ceph-quincy {{ repo_distribution_release }} no-subscription"

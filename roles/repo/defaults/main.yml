@@ -1,0 +1,5 @@
+---
+repo_distribution_release: "{{ ansible_distribution_release }}"
+repo_enterprise: false
+repo_no_subscription: true
+repo_ceph: false
