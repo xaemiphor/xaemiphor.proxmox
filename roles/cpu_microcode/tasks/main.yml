@@ -13,3 +13,5 @@
       other: "{{ 'GenuineIntel' not in ansible_processor and 'AuthenticAMD' not in ansible_processor }}"
       error: "{{ 'GenuineIntel' in ansible_processor and 'AuthenticAMD' in ansible_processor }}"
     __cpu_type: "{{ __cpu_type_dict | dict2items | selectattr('value') | map(attribute='key') | last }}"
+  notify:
+    - Reboot host
