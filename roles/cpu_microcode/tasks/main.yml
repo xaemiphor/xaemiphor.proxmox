@@ -1,0 +1,15 @@
+---
+- name: Install microcode packages
+  ansible.builtin.apt:
+    cache_valid_time: 3600
+    state: present
+    pkg:
+      - "iucode-tool"
+      - "{{ __cpu_type }}-microcode"
+  vars:
+    __cpu_type_dict:
+      intel: "{{ 'GenuineIntel' in ansible_processor }}"
+      amd64: "{{ 'AuthenticAMD' in ansible_processor }}"
+      other: "{{ 'GenuineIntel' not in ansible_processor and 'AuthenticAMD' not in ansible_processor }}"
+      error: "{{ 'GenuineIntel' in ansible_processor and 'AuthenticAMD' in ansible_processor }}"
+    __cpu_type: "{{ __cpu_type_dict | dict2items | selectattr('value') | map(attribute='key') | last }}"
