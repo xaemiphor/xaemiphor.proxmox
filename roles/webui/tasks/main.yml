@@ -1,0 +1,19 @@
+---
+- name: 
+  vars:
+    __config:
+      bookworm: |
+        DPkg::Post-Invoke { "dpkg -V proxmox-widget-toolkit | grep -q '/proxmoxlib\.js$'; if [ $? -eq 1 ]; then { echo 'Removing subscription nag from UI...'; sed -i '/.*data\.status.*{/{s/\!//;s/active/NoMoreNagging/}' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; }; fi"; };
+  block:
+    - name: Configure nag screen
+      when:
+        - not webui_nag
+        - ansible_distribution_release in __config
+      notify:
+        - Reinstall proxmox-widget-toolkit
+      ansible.builtin.copy:
+        dest: /etc/apt/apt.conf.d/no-nag-script
+        content: "{{ __config[ansible_distribution_release] }}"
+        owner: root
+        group: root
+        mode: '0644'

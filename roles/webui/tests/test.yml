@@ -1,0 +1,6 @@
+---
+- name: Test iommu role
+  hosts: localhost
+  remote_user: root
+  roles:
+    - iommu
