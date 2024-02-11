@@ -34,12 +34,14 @@
   ansible.builtin.lineinfile:
     state: "{{ 'present' if iommu_state | lower in ['enable', 'enabled'] else 'absent' }}"
     dest: /etc/modules
-    line: "{{ item }}"
+    line: "{{ item.line }}"
+  when: item.when | default(true)
   loop:
-    - vfio
-    - vfio_iommu_type1
-    - vfio_pci
-    - vfio_virqfd
+    - line: vfio
+    - line: vfio_iommu_type1
+    - line: vfio_pci
+    - line: vfio_virqfd
+      when: ansible_kernel is version('6.2','<')
   notify:
     - Update initramfs
     - Reboot host
