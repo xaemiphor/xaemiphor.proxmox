@@ -1,0 +1,10 @@
+---
+- name: Update PCI-ID database
+  ansible.builtin.command: /usr/sbin/update-pciids
+  changed_when: false
+
+- name: Process PCI-ID devices
+  loop: "{{ pci_passthrough_ids | sort | unique }}"
+  ansible.builtin.include_tasks: configure_passthrough.yml
+  loop_control:
+    loop_var: passthrough_id

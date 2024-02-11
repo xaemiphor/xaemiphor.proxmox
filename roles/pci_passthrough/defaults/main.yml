@@ -1,0 +1,3 @@
+---
+pci_passthrough_reboot: false
+pci_passthrough_ids: []

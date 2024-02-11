@@ -1,0 +1,42 @@
+---
+- name: "configure_passthrough | Checking for device {{ passthrough_id }}"
+  ansible.builtin.shell: "/usr/bin/lspci -n -k -d '{{ passthrough_id }}'"
+  register: __passthrough_target
+  failed_when: false
+  changed_when: false
+  tags:
+    - skip_ansible_lint
+
+- name: "configure_passthrough | Blacklist drivers for {{ passthrough_id }}"
+  ansible.builtin.lineinfile:
+    state: present
+    dest: /etc/modprobe.d/blacklist.conf
+    line: 'blacklist {{ item }}'
+    create: true
+    mode: '0644'
+    owner: root
+    group: root
+  loop: "{{ __kmods | first | replace('\tKernel modules: ', '') | split(', ') }}"
+  notify:
+    - Reboot host
+  when: __kmods | length > 0
+  vars:
+    __kmods: "{{ __passthrough_target.stdout_lines | select('search','Kernel modules') }}"
+
+- name: "configure_passthrough | Read existing vfio-pci configuration"
+  ansible.builtin.slurp:
+    src: /etc/modprobe.d/vfio-pci.conf
+  register: __vfio_b64
+  ignore_errors: true
+
+- name: "configure_passthrough | Assign PCI-ID {{ passthrough_id }} to vfio-pci"
+  vars:
+    __existing_ids: "{{ [] if 'content' not in __vfio_b64 else (__vfio_b64['content'] | b64decode | regex_findall('ids=([0-9a-fA-F:,]+)') | map('split',',') | flatten ) }}"
+  ansible.builtin.copy:
+    dest: /etc/modprobe.d/vfio-pci.conf
+    content: "options vfio-pci ids={{ (__existing_ids + [passthrough_id]) | sort | unique | join(',') }}"
+    mode: '0644'
+    owner: root
+    group: root
+  notify:
+    - Reboot host
