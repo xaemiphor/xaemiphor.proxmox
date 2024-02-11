@@ -18,6 +18,7 @@
     group: root
   loop: "{{ __kmods | first | replace('\tKernel modules: ', '') | split(', ') }}"
   notify:
+    - Update initramfs
     - Reboot host
   when: __kmods | length > 0
   vars:
@@ -39,4 +40,5 @@
     owner: root
     group: root
   notify:
+    - Update initramfs
     - Reboot host
