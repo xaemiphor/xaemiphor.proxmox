@@ -22,7 +22,7 @@
     - Reboot host
   when: __kmods | length > 0
   vars:
-    __kmods: "{{ __passthrough_target.stdout_lines | select('search','Kernel modules') }}"
+    __kmods: "{{ __passthrough_target.stdout_lines | select('search', 'Kernel modules') }}"
 
 - name: "configure_passthrough | Read existing vfio-pci configuration"
   ansible.builtin.slurp:
@@ -30,9 +30,9 @@
   register: __vfio_b64
   ignore_errors: true
 
-- name: "configure_passthrough | Assign PCI-ID {{ passthrough_id }} to vfio-pci"
+- name: "configure_passthrough | Assign PCI-ID to vfio-pci {{ passthrough_id }}"
   vars:
-    __existing_ids: "{{ [] if 'content' not in __vfio_b64 else (__vfio_b64['content'] | b64decode | regex_findall('ids=([0-9a-fA-F:,]+)') | map('split',',') | flatten ) }}"
+    __existing_ids: "{{ [] if 'content' not in __vfio_b64 else (__vfio_b64['content'] | b64decode | regex_findall('ids=([0-9a-fA-F:,]+)') | map('split', ',') | flatten) }}"
   ansible.builtin.copy:
     dest: /etc/modprobe.d/vfio-pci.conf
     content: "options vfio-pci ids={{ (__existing_ids + [passthrough_id]) | sort | unique | join(',') }}"
