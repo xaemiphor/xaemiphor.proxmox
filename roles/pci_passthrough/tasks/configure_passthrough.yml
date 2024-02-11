@@ -16,7 +16,7 @@
     mode: '0644'
     owner: root
     group: root
-  loop: "{{ __kmods | first | replace('\tKernel modules: ', '') | split(', ') }}"
+  loop: "{{ __kmods | first | regex_findall('Kernel modules: (.*)$') | map('split', ', ') | flatten }}"
   notify:
     - Update initramfs
     - Reboot host
