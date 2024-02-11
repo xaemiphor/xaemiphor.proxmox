@@ -1,0 +1,3 @@
+---
+split_igpu_intel_state: enabled
+split_igpu_intel_reboot: false

@@ -1,0 +1,16 @@
+---
+- name: systemd-boot_enable | Update /etc/kernel/cmdline
+  become: true
+  notify:
+    - Update systemd-boot
+  ansible.builtin.lineinfile:
+    state: present
+    dest: /etc/kernel/cmdline
+    backrefs: true
+    regexp: "{{ __regexp.pre }}{{ item }}{{ __regexp.post }}"
+    line: "\\1 {{ item }}"
+  loop: "{{ __cfg_keys }}"
+  vars:
+    __regexp:
+      pre: '^(?!.*'
+      post: ')(.*)$'

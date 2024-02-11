@@ -1,0 +1,17 @@
+---
+- name: grub_enable | Update /etc/default/grub
+  become: true
+  notify:
+    - Update grub
+    - Reboot host
+  ansible.builtin.lineinfile:
+    state: present
+    dest: /etc/default/grub
+    backrefs: true
+    regexp: "{{ __regexp.pre }}{{ item }}{{ __regexp.post }}"
+    line: "\\1 {{ item }}\\2"
+  loop: "{{ __cfg_keys }}"
+  vars:
+    __regexp:
+      pre: '^(GRUB_CMDLINE_LINUX_DEFAULT=(?!.*\b'
+      post: '\b)\"[^\"]+)(\".*)'

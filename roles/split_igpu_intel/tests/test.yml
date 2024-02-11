@@ -1,0 +1,6 @@
+---
+- name: Test split_igpu_intel role
+  hosts: localhost
+  remote_user: root
+  roles:
+    - split_igpu_intel
