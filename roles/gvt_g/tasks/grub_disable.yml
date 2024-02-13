@@ -2,8 +2,8 @@
 - name: grub_disable | Update /etc/default/grub
   become: true
   notify:
-    - Update grub
-    - Reboot host
+    - 'gvt_g : Update grub'
+    - 'gvt_g : Reboot host'
   ansible.builtin.lineinfile:
     state: present
     dest: /etc/default/grub

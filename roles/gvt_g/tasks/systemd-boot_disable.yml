@@ -1,16 +1,17 @@
 ---
-- name: systemd-boot_enable | Update /etc/kernel/cmdline
+- name: systemd-boot_disable | Update /etc/kernel/cmdline
   become: true
   notify:
-    - Update systemd-boot
+    - 'gvt_g : Refresh proxmox-boot-tool'
+    - 'gvt_g : Reboot host'
   ansible.builtin.lineinfile:
     state: present
     dest: /etc/kernel/cmdline
     backrefs: true
     regexp: "{{ __regexp.pre }}{{ item }}{{ __regexp.post }}"
-    line: "\\1 {{ item }}"
+    line: "\\1\\3"
   loop: "{{ __cfg_keys }}"
   vars:
     __regexp:
-      pre: '^(?!.*'
-      post: ')(.*)$'
+      pre: '^(.*)\s*\b(\s'
+      post: ')\b(.*)$'

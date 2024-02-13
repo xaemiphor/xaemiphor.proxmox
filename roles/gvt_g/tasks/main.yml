@@ -24,19 +24,19 @@
     - name: "Update {{ __boot_type }}"
       ansible.builtin.include_tasks: "{{ __boot_type }}_{{ __include }}.yml"
       vars:
-        __include: "{{ 'enable' if split_igpu_intel_state | lower in ['enable', 'enabled'] else 'disable' }}"
+        __include: "{{ 'enable' if gvt_g_state | lower in ['enable', 'enabled'] else 'disable' }}"
         __cfg_keys_list:
           - "i915.enable_gvt=1"
         __cfg_keys: "{{ __cfg_keys_list | select('defined') }}"
 
 - name: Add VFIO modules to system startup
   ansible.builtin.lineinfile:
-    state: "{{ 'present' if split_igpu_intel_state | lower in ['enable', 'enabled'] else 'absent' }}"
+    state: "{{ 'present' if gvt_g_state | lower in ['enable', 'enabled'] else 'absent' }}"
     dest: /etc/modules
     line: "{{ item.line }}"
   when: item.when | default(true)
   loop:
     - line: kvmgt # Intel GVT-g Split
   notify:
-    - Update initramfs
-    - Reboot host
+    - 'gvt_g : Update initramfs'
+    - 'gvt_g : Reboot host'
