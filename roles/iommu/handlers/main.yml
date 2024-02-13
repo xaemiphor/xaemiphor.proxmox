@@ -1,16 +1,19 @@
 ---
-- name: Update grub
+- name: 'iommu : Update grub'
   ansible.builtin.command: /usr/sbin/update-grub
   changed_when: true
 
-- name: Update systemd-boot
-  ansible.builtin.command: /usr/sbin/proxmox-boot-tool refresh
-  changed_when: true
-
-- name: Update initramfs
+- name: 'iommu : Update initramfs'
   ansible.builtin.command: /usr/sbin/update-initramfs -u -k all
   changed_when: true
 
-- name: Reboot host
+- name: 'iommu : Refresh proxmox-boot-tool'
+  ansible.builtin.command: /usr/sbin/proxmox-boot-tool refresh
+  changed_when: true
+  listen:
+    - 'iommu : Update initramfs'
+    - 'iommu : Refresh proxmox-boot-tool'
+
+- name: 'iommu : Reboot host'
   ansible.builtin.reboot:
   when: iommu_reboot | default(false)

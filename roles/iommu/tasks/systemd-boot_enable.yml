@@ -2,7 +2,8 @@
 - name: systemd-boot_enable | Update /etc/kernel/cmdline
   become: true
   notify:
-    - Update systemd-boot
+    - 'iommu : Refresh proxmox-boot-tool'
+    - 'iommu : Reboot host'
   ansible.builtin.lineinfile:
     state: present
     dest: /etc/kernel/cmdline

@@ -10,7 +10,7 @@
         - not webui_nag
         - ansible_distribution_release in __config
       notify:
-        - Reinstall proxmox-widget-toolkit
+        - 'webui : Reinstall proxmox-widget-toolkit'
       ansible.builtin.copy:
         dest: /etc/apt/apt.conf.d/no-nag-script
         content: "{{ __config[ansible_distribution_release] }}"

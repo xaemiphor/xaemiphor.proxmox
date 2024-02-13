@@ -18,8 +18,9 @@
     group: root
   loop: "{{ __kmods | first | regex_findall('Kernel modules: (.*)$') | map('split', ', ') | flatten }}"
   notify:
-    - Update initramfs
-    - Reboot host
+    - "pci_passthrough : Update initramfs"
+    - "pci_passthrough : Refresh proxmox-boot-tool"
+    - "pci_passthrough : Reboot host"
   when: __kmods | length > 0
   vars:
     __kmods: "{{ __passthrough_target.stdout_lines | select('search', 'Kernel modules') }}"
@@ -40,5 +41,6 @@
     owner: root
     group: root
   notify:
-    - Update initramfs
-    - Reboot host
+    - "pci_passthrough : Update initramfs"
+    - "pci_passthrough : Refresh proxmox-boot-tool"
+    - "pci_passthrough : Reboot host"

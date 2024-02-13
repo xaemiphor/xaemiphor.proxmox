@@ -2,8 +2,8 @@
 - name: grub_enable | Update /etc/default/grub
   become: true
   notify:
-    - Update grub
-    - Reboot host
+    - 'iommu : Update grub'
+    - 'iommu : Reboot host'
   ansible.builtin.lineinfile:
     state: present
     dest: /etc/default/grub

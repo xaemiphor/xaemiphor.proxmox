@@ -1,8 +1,15 @@
 ---
-- name: Update initramfs
+- name: 'pci_passthrough : Update initramfs'
   ansible.builtin.command: /usr/sbin/update-initramfs -u -k all
   changed_when: true
 
-- name: Reboot host
+- name: 'pci_passthrough : Refresh proxmox-boot-tool'
+  ansible.builtin.command: /usr/sbin/proxmox-boot-tool refresh
+  changed_when: true
+  listen:
+    - 'pci_passthrough : Update initramfs'
+    - 'pci_passthrough : Refresh proxmox-boot-tool'
+
+- name: 'pci_passthrough : Reboot host'
   ansible.builtin.reboot:
   when: pci_passthrough_reboot | default(false)

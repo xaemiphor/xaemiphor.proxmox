@@ -1,5 +1,5 @@
 ---
-- name: Reinstall proxmox-widget-toolkit
+- name: 'webui : Reinstall proxmox-widget-toolkit'
   ansible.builtin.command: apt-get --reinstall install proxmox-widget-toolkit
   changed_when: true
   tags:
