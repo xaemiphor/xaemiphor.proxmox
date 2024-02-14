@@ -26,8 +26,8 @@
     - label: "PVE Ceph enterprise"
       path: /etc/apt/sources.list.d/ceph.list
       when: "{{ ansible_distribution_major_version is version('12', '>=') }}"
-      regexp: "(.*)deb http://download.proxmox.com/debian/ceph-quincy (.*) enterprise"
-      line: "deb http://download.proxmox.com/debian/ceph-quincy {{ repo_distribution_release }} enterprise"
+      regexp: "(.*)deb http://enterprise.proxmox.com/debian/ceph-quincy (.*) enterprise"
+      line: "deb http://enterprise.proxmox.com/debian/ceph-quincy {{ repo_distribution_release }} enterprise"
       enabled: "{{ (repo_ceph and repo_enterprise) | bool }}"
     - label: "PVE Ceph no-subscription"
       path: /etc/apt/sources.list.d/ceph.list
