@@ -1,6 +1,6 @@
 ---
-- name: Test gvt_g role
+- name: Test intel_gvt_g role
   hosts: localhost
   remote_user: root
   roles:
-    - gvt_g
+    - intel_gvt_g
