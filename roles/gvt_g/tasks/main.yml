@@ -38,5 +38,5 @@
   loop:
     - line: kvmgt # Intel GVT-g Split
   notify:
-    - 'gvt_g : Update initramfs'
-    - 'gvt_g : Reboot host'
+    - 'pve_handlers : Update initramfs'
+    - 'pve_handlers : Reboot host'

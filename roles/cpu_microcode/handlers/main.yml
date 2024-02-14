@@ -1,4 +1,1 @@
 ---
-- name: 'cpu_microcode : Reboot host'
-  ansible.builtin.reboot:
-  when: cpu_microcode_reboot | default(false)

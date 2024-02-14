@@ -2,8 +2,8 @@
 - name: systemd-boot_disable | Update /etc/kernel/cmdline
   become: true
   notify:
-    - 'gvt_g : Refresh proxmox-boot-tool'
-    - 'gvt_g : Reboot host'
+    - 'pve_handlers : Refresh proxmox-boot-tool'
+    - 'pve_handlers : Reboot host'
   ansible.builtin.lineinfile:
     state: present
     dest: /etc/kernel/cmdline

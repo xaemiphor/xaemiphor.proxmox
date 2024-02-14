@@ -1,4 +1,1 @@
 ---
-- name: 'nested_virt : Reboot host'
-  ansible.builtin.reboot:
-  when: nested_virt_reboot | default(false)

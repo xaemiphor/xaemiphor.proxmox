@@ -43,6 +43,6 @@
     - line: vfio_virqfd
       when: ansible_kernel is version('6.2','<')
   notify:
-    - 'iommu : Update initramfs'
-    - 'iommu : Refresh proxmox-boot-tool'
-    - 'iommu : Reboot host'
+    - 'pve_handlers : Update initramfs'
+    - 'pve_handlers : Refresh proxmox-boot-tool'
+    - 'pve_handlers : Reboot host'

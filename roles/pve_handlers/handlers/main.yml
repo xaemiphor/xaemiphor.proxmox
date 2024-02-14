@@ -1,0 +1,25 @@
+---
+- name: 'pve_handlers : Update grub'
+  ansible.builtin.command: /usr/sbin/update-grub
+  changed_when: true
+
+- name: 'pve_handlers : Update initramfs'
+  ansible.builtin.command: /usr/sbin/update-initramfs -u -k all
+  changed_when: true
+
+- name: 'pve_handlers : Refresh proxmox-boot-tool'
+  ansible.builtin.command: /usr/sbin/proxmox-boot-tool refresh
+  changed_when: true
+  listen:
+    - 'pve_handlers : Update initramfs'
+    - 'pve_handlers : Refresh proxmox-boot-tool'
+
+- name: 'pve_handlers : Reboot host'
+  ansible.builtin.reboot:
+  when: >
+    (cpu_microcode_reboot | default(false)) or
+    (gvt_g_reboot | default(false)) or
+    (iommu_reboot | default(false)) or
+    (nested_virt_reboot | default(false)) or
+    (pci_passthrough_reboot | default(false)) or
+    (pve_handlers_reboot | default(false))

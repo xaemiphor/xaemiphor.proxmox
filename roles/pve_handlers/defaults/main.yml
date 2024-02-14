@@ -1,0 +1,4 @@
+---
+pve_handlers_state: enabled
+pve_handlers_pt: true
+pve_handlers_reboot: false
