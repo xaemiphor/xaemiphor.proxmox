@@ -21,5 +21,6 @@
     (gvt_g_reboot | default(false)) or
     (iommu_reboot | default(false)) or
     (nested_virt_reboot | default(false)) or
+    (nvidia_vgpu_reboot | default(false)) or
     (pci_passthrough_reboot | default(false)) or
     (pve_handlers_reboot | default(false))

@@ -1,0 +1,90 @@
+---
+- name: Update PCI-ID database
+  ansible.builtin.command: /usr/sbin/update-pciids
+  changed_when: false
+
+- name: Check if any specified PCI-IDs are detected
+  loop: "{{ nvidia_vgpu_ids | sort | unique }}"
+  loop_control:
+    loop_var: vgpu_id
+  ansible.builtin.shell: "/usr/bin/lspci -n -k -d '{{ vgpu_id }}'"
+  register: __nvidia_devices
+  failed_when: false
+  changed_when: __nvidia_devices.stdout_lines | length > 0
+  tags:
+    - skip_ansible_lint
+
+- name: Check if we can find any nVIDIA Driver Packages in /root
+  ansible.builtin.find:
+    paths: /root
+    patterns:
+      - 'NVIDIA-Linux-x86_64-*-vgpu-kvm.run'
+  register: __nvidia_drivers
+
+- name: Check if nvidia-smi is present
+  ansible.builtin.stat:
+    path: /usr/bin/nvidia-smi
+  register: __nvidia_installed
+
+- name: nVIDIA vGPU Cards were detected
+  when:
+    - __nvidia_devices.changed
+  block:
+    - name: "configure_vgpu | Prepare Dependencies"
+      ansible.builtin.apt:
+        cache_valid_time: 3600
+        state: present
+        install_recommends: false
+        pkg:
+          - dkms
+          - libc6-dev
+          - proxmox-default-headers
+          - mdevctl
+
+    - name: "configure_vgpu | Blacklist nouveau"
+      ansible.builtin.lineinfile:
+        state: present
+        dest: /etc/modprobe.d/blacklist.conf
+        line: 'blacklist {{ item }}'
+        create: true
+        mode: '0644'
+        owner: root
+        group: root
+      loop:
+        - nouveau
+      notify:
+        - "pve_handlers : Update initramfs"
+        - "pve_handlers : Refresh proxmox-boot-tool"
+        - "pve_handlers : Reboot host"
+      register: __nvidia_vgpu_blacklist
+
+    - name: Flush handlers(Trigger pending reboots, etc)
+      meta: flush_handlers
+      when: __nvidia_vgpu_blacklist.changed
+
+- name: nVIDIA vGPU was detected and driverfile found
+  when:
+    - __nvidia_devices.changed
+    - __nvidia_drivers.files | length > 0
+  vars:
+    __nvidia_driver_path: "{{ __nvidia_drivers.files | map(attribute='path') | community.general.version_sort | last }}"
+  block:
+    - name: Ensure driver installer is executable
+      ansible.builtin.file:
+        path: "{{ __nvidia_driver_path }}"
+        owner: root
+        group: root
+        mode: '0755'
+    - name: Install nVIDIA vGPU Host Drivers
+      ansible.builtin.command:
+        cmd: "{{ __nvidia_driver_path }} --dkms --no-questions --accept-license --silent --no-install-compat32-libs --no-cc-version-check"
+        chdir: '{{ __nvidia_driver_path | dirname }}'
+        creates: '/usr/bin/nvidia-smi'
+      notify:
+        - "pve_handlers : Reboot host"
+  rescue:
+    - name: Reverting nVIDIA vGPU Host Drivers
+      ansible.builtin.command:
+        cmd: "{{ __nvidia_driver_path }} --no-questions --silent --uninstall"
+        chdir: '{{ __nvidia_driver_path | dirname }}'
+        creates: '/usr/bin/nvidia-smi'

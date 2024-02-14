@@ -1,0 +1,8 @@
+---
+nvidia_vgpu_state: enabled
+nvidia_vgpu_reboot: false
+nvidia_vgpu_ids:
+  - 10de:1431 # NVIDIA Corporation GM206GL [Tesla M4]
+  - 10de:17fd # NVIDIA Corporation GM200GL [Tesla M40]
+  - 10de:1bb3 # NVIDIA Corporation GP104GL [Tesla P4]
+  - 10de:1b38 # NVIDIA Corporation GP102GL [Tesla P40]

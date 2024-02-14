@@ -1,0 +1,46 @@
+---
+- name: "configure_vgpu | Checking for device {{ vgpu_id }}"
+  ansible.builtin.shell: "/usr/bin/lspci -n -k -d '{{ vgpu_id }}'"
+  register: __vgpu_target
+  failed_when: false
+  changed_when: false
+  tags:
+    - skip_ansible_lint
+
+- name: Device was identified
+  when:
+    - (__vgpu_target.stdout_lines | length > 0)
+  block:
+    - name: "configure_vgpu | Prepare Dependencies"
+      ansible.builtin.apt:
+        cache_valid_time: 3600
+        state: present
+        install_recommends: false
+        pkg:
+          - dkms
+          - libc6-dev
+          - proxmox-default-headers
+          - mdevctl
+
+    - name: "configure_vgpu | Blacklist drivers for {{ vgpu_id }}"
+      ansible.builtin.lineinfile:
+        state: present
+        dest: /etc/modprobe.d/blacklist.conf
+        line: 'blacklist {{ item }}'
+        create: true
+        mode: '0644'
+        owner: root
+        group: root
+      loop: "{{ __kmods | first | regex_findall('Kernel modules: (.*)$') | map('split', ', ') | flatten }}"
+      notify:
+        - "pve_handlers : Update initramfs"
+        - "pve_handlers : Refresh proxmox-boot-tool"
+        - "pve_handlers : Reboot host"
+      when: 
+        - __kmods | length > 0
+        - item in ['nouveau']
+      vars:
+        __kmods: "{{ __vgpu_target.stdout_lines | select('search', 'Kernel modules') }}"
+
+    - name: Flush handlers(Trigger pending reboots, etc)
+      meta: flush_handlers
