@@ -34,4 +34,5 @@
           state: "{{ 'present' if (nested_virt_state in ['enable', 'enabled'] and __cpu_type == 'amd') else 'absent' }}"
 #          notify: 'Reload kvm_amd'
       notify:
+        - "pve_handlers : Update initramfs"
         - 'pve_handlers : Reboot host'
