@@ -44,3 +44,5 @@
     - "pve_handlers : Update initramfs"
     - "pve_handlers : Refresh proxmox-boot-tool"
     - "pve_handlers : Reboot host"
+  when:
+    - __passthrough_target.stdout | length > 0 or __passthrough_target.stderr | length > 0
