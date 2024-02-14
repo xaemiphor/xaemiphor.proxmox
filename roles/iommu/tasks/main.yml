@@ -6,7 +6,7 @@
 
 - name: Generate variables for validation and update
   vars:
-    __boot_type: "{{ 'systemd-boot' if __systemd_boot.stat.exists and __systemd_boot.stat.isdir else 'grub' }}"
+    __boot_type: "{{ 'systemd-boot' if __systemd_boot.stat.exists and __systemd_boot.stat.isreg else 'grub' }}"
     __cpu_type_dict:
       intel: "{{ 'GenuineIntel' in ansible_processor }}"
       amd: "{{ 'AuthenticAMD' in ansible_processor }}"
