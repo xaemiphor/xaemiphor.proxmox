@@ -1,1 +1,4 @@
 ---
+- name: 'networking : Reload networking'
+  ansible.builtin.command: '/usr/sbin/ifreload -a'
+  failed_when: false

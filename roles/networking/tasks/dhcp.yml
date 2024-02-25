@@ -8,6 +8,8 @@
     state: "{{ item.state }}"
   loop:
     - { state: 'present', regexp: "^iface {{ networking_iface }} inet.*", line: "iface {{ networking_iface }} inet dhcp" }
+  notify:
+    - 'networking : Reload networking'
 
 - name: Clean gateways or addresses from iface
   become: true
@@ -21,3 +23,5 @@
   loop:
     - { state: 'absent', option: 'gateway' }
     - { state: 'absent', option: 'address' }
+  notify:
+    - 'networking : Reload networking'

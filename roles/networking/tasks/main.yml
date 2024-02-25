@@ -22,4 +22,5 @@
   loop:
     - { state: "{{ 'present' if networking_vlan_aware | default(false) else 'absent' }}", option: 'bridge-vlan-aware', value: 'yes' }
     - { state: "{{ 'present' if networking_vlan_aware | default(false) else 'absent' }}", option: 'bridge-vids', value: '2-4094' }
-
+  notify:
+    - 'networking : Reload networking'
