@@ -1,0 +1,18 @@
+---
+# TODO Currently testing/using this for modifying vmbr0/existing interfaces, may consider expanding for creating or removing interfaces...
+- name: Set interface configuration
+  ansible.builtin.include_tasks: "{{ networking_type }}.yml"
+
+- name: Configure vlan-aware
+  become: true
+  community.general.interfaces_file:
+    dest: /etc/network/interfaces
+    iface: "{{ networking_iface }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value | default(omit) }}"
+    state: "{{ item.state }}"
+    backup: true
+  loop:
+    - { state: "{{ 'present' if networking_vlan_aware | default(false) else 'absent' }}", option: 'bridge-vlan-aware', value: 'yes' }
+    - { state: "{{ 'present' if networking_vlan_aware | default(false) else 'absent' }}", option: 'bridge-vids', value: '2-4094' }
+

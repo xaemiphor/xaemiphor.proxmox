@@ -1,0 +1,23 @@
+---
+- name: Set iface to dhcp
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/network/interfaces
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: "{{ item.state }}"
+  loop:
+    - { state: 'present', regexp: "^iface {{ networking_iface }} inet.*", line: "iface {{ networking_iface }} inet dhcp" }
+
+- name: Clean gateways or addresses from iface
+  become: true
+  community.general.interfaces_file:
+    dest: /etc/network/interfaces
+    iface: "{{ networking_iface }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value | default(omit) }}"
+    state: "{{ item.state }}"
+    backup: true
+  loop:
+    - { state: 'absent', option: 'gateway' }
+    - { state: 'absent', option: 'address' }
