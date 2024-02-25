@@ -1,5 +1,12 @@
 ---
 # TODO Currently testing/using this for modifying vmbr0/existing interfaces, may consider expanding for creating or removing interfaces...
+- name: 'Install dep packages'
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+    pkg:
+      - ifupdown2
+
 - name: Set interface configuration
   ansible.builtin.include_tasks: "{{ networking_type }}.yml"
 
