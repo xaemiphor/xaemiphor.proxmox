@@ -1,0 +1,17 @@
+#!/bin/sh
+# dhclient change hosts script for proxmox
+# /etc/dhcp/dhclient-exit-hooks.d/update_hosts
+
+# for debugging:
+echo "update_hosts BEGIN"
+#export
+set -x
+
+if [ $reason = "BOUND" ]; then
+  TMPHOSTS=/etc/hosts.dhcp.new
+  CUR_HOSTNAME=$(hostname -s)
+  NEW_VALUE="${new_ip_address} ${CUR_HOSTNAME}.${new_domain_name} ${CUR_HOSTNAME}"
+  sed "s@.*${CUR_HOSTNAME}\$@${NEW_VALUE}@" /etc/hosts | tee ${TMPHOSTS}
+  mv ${TMPHOSTS} /etc/hosts
+fi
+echo "update_hosts END"

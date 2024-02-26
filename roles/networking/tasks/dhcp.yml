@@ -1,5 +1,15 @@
 ---
-- name: Set iface to dhcp
+- name: dhcp | Add dhclient hook
+  ansible.builtin.copy:
+    src: update_hosts
+    dest: '/etc/dhcp/dhclient-exit-hooks.d/update_hosts'
+    mode: '0755'
+    owner: root
+    group: root
+  notify:
+    - 'networking : Reload networking'
+
+- name: dhcp | Set iface to dhcp
   become: true
   ansible.builtin.lineinfile:
     path: /etc/network/interfaces
@@ -11,7 +21,7 @@
   notify:
     - 'networking : Reload networking'
 
-- name: Clean gateways or addresses from iface
+- name: dhcp | Clean gateways or addresses from iface
   become: true
   community.general.interfaces_file:
     dest: /etc/network/interfaces
